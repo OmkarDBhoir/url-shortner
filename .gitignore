@@ -1,0 +1,36 @@
+# Java-related files
+*.class
+*.jar
+*.war
+*.ear
+*.log
+*.db
+
+# Eclipse and IntelliJ IDE related files
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+
+# Spring Boot specific files
+target/
+build/
+
+# Node.js dependencies
+node_modules/
+
+# OS-specific files
+Thumbs.db
+Desktop.ini
+
+# Maven and Gradle build files
+*.log
+*.bak
+*.swp
+.DS_Store
+
+# Eclipse-related files
+.metadata/
