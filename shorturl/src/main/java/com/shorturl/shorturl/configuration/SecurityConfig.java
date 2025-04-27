@@ -30,15 +30,10 @@ public class SecurityConfig {
 				.csrf(csrf -> csrf.disable())
 				.cors(cors -> cors.configurationSource(corsConfigurationSource))
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/api/url/shorten").hasRole("USER")
-						.requestMatchers("/api/url").permitAll()
+						.requestMatchers("/**").permitAll()
+						.requestMatchers("/api/url/shorten").permitAll()
 						.anyRequest().authenticated()
-						)
-				.formLogin(form -> form
-						.permitAll()
-				)
-				.logout(logout -> logout.permitAll()
-				).build();
+						).build();
 	}
 	
 	@Bean

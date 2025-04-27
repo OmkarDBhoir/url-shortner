@@ -24,7 +24,7 @@ public class UrlServiceImpl implements UrlService {
 		String longUrl = null;
 		try {
 			
-			longUrl = urlRepo.getUrlByShortUrl(shortUrl);
+			longUrl = urlRepo.getLongtUrlByShortUrl(shortUrl);
 			
 		} catch (Exception e) {
 			
@@ -39,7 +39,7 @@ public class UrlServiceImpl implements UrlService {
 		
 		try {
 			
-			shortUrl = urlRepo.getUrlByLongUrl(longUrl);
+			shortUrl = urlRepo.getShortUrlByLongUrl(longUrl);
 			
 		} catch (Exception e) {
 			
@@ -85,18 +85,15 @@ public class UrlServiceImpl implements UrlService {
 		
 		try {
 			
-			shortUrl = urlRepo.getUrlByLongUrl(longUrl);
+			shortUrl = urlRepo.getShortUrlByLongUrl(longUrl);
 			
-			if(shortUrl != null) {
-				return shortUrl;
-			}
-			
-			hash = generateRandomString(6);
 			baseUrl = urlMasterService.getValueByTypeAndKey(UrlServiceConstants.BASE_URL, UrlServiceConstants.BASE_URL);
-			
-			if(baseUrl != null) {
-				shortUrl = baseUrl + hash;
+			if(shortUrl != null) {
+				return baseUrl + shortUrl;
 			}
+			
+			shortUrl = generateRandomString(6);
+			
 			
 			while(urlRepo.existsByShortUrl(shortUrl)) {
 				shortUrl = generateRandomString(6);
@@ -110,6 +107,8 @@ public class UrlServiceImpl implements UrlService {
 				url.setCreateOn(Calendar.getInstance().getTime());
 				urlRepo.saveAndFlush(url);
 			}
+			
+			shortUrl = baseUrl + shortUrl;
 			
 			System.out.println("ShortUrl stored");
 			

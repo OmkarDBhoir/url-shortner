@@ -26,7 +26,7 @@ public class Url implements Serializable {
 	@Column(name="short_url", unique=true, nullable=false)
 	private String shortUrl;
 	
-	@Column(name="long_url", nullable=false)
+	@Column(name="long_url", nullable=false, unique=true)
 	private String longUrl;
 	
 	@Column(name="createdby")
