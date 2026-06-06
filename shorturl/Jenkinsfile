@@ -3,16 +3,11 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                git branch: 'main',
-                    url: 'https://github.com/YOUR_USERNAME/YOUR_REPO.git'
-            }
-        }
-
         stage('Build') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                dir('shorturl') {
+                    sh 'mvn clean package -DskipTests'
+                }
             }
         }
     }
