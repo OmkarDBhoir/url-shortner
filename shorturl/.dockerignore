@@ -1,0 +1,5 @@
+target
+.git
+.idea
+.metadata
+node_modules

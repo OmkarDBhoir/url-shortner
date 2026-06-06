@@ -28,7 +28,7 @@
 		<Logger name="org.springframework" level="WARN"/>
 		<Root level="DEBUG">
 			<AppenderRef ref="FileAppender" />
-<!--			<AppenderRef ref="ConsoleAppender"/>-->
+			<AppenderRef ref="ConsoleAppender"/>
 		</Root>
 	</Loggers>
 
