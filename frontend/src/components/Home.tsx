@@ -1,14 +1,15 @@
+import type { FC } from "react";
 import Card from "./Card";
 import Navbar from "./Navbar";
 
-const Home: React.FC = () => {
+const Home: FC = () => {
     return (
-        <>
+        <div className="home-page">
             <Navbar />
-            <div className="card-wrapper">
+            <main className="content-wrapper">
                 <Card />
-            </div>
-        </>
+            </main>
+        </div>
     )
 }
 
