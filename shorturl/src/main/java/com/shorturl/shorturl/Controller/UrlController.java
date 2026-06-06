@@ -18,7 +18,7 @@ import com.shorturl.shorturl.utils.FLogger;
 
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/api")
 public class UrlController {
 	
 	private static final Logger logger_cat = LogManager.getLogger(UrlController.class);
@@ -26,7 +26,7 @@ public class UrlController {
 	@Autowired
 	private UrlService urlService;
 	
-	@PostMapping(value="/api/url/shorten", consumes="text/plain")
+	@PostMapping(value="/url/shorten", consumes="text/plain")
 	@ResponseBody
 	public String shortUrl(@RequestBody String longUrl) {
 		String shortUrl = null;

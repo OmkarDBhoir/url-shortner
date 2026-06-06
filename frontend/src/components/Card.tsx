@@ -21,7 +21,7 @@ const Card: FC = () => {
 
         try {
             setIsLoading(true);
-            const response = await axios.post(`${BaseConstant.baseUrl}/api/url/shorten`, url, {
+            const response = await axios.post(`${BaseConstant.baseUrl}/url/shorten`, url, {
                 headers: {
                     "Content-Type": "text/plain"
                 }
