@@ -3,10 +3,18 @@ pipeline {
 
     stages {
 
-        stage('Build') {
+        stage('Build Jar') {
             steps {
                 dir('shorturl') {
                     sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Verify Artifact') {
+            steps {
+                dir('shorturl') {
+                    sh 'ls -lrt target/'
                 }
             }
         }
