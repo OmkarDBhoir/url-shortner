@@ -1,8 +1,17 @@
-/* groovylint-disable-next-line CompileStatic */
 pipeline {
     agent any
 
+    environment {
+        AWS_REGION = "${env.AWS_REGION}"
+        ACCOUNT_ID = "${env.ACCOUNT_ID}"
+        ECR_REPOSITORY = "url-shortener"
+        ECS_CLUSTER = "url-shortener-cluster"
+        ECS_SERVICE = "url-shortener-task-service"
+        IMAGE_TAG = "${env.BUILD_NUMBER}"
+    }
+
     stages {
+
         stage('Build Jar') {
             steps {
                 dir('shorturl') {
@@ -11,38 +20,50 @@ pipeline {
             }
         }
 
-        stage('Verify Artifact') {
-            steps {
-                dir('shorturl') {
-                    sh 'ls -lrt target/'
-                }
-            }
-        }
-
         stage('Docker Build') {
             steps {
                 dir('shorturl') {
                     sh '''
-            docker build -t url-shortener:latest .
-            '''
+                        docker build \
+                        -t ${ECR_REPOSITORY}:${IMAGE_TAG} \
+                        -t ${ECR_REPOSITORY}:latest .
+                    '''
                 }
+            }
+        }
+
+        stage('Login To ECR') {
+            steps {
+                sh '''
+                    aws ecr get-login-password --region $AWS_REGION | \
+                    docker login \
+                    --username AWS \
+                    --password-stdin \
+                    $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+                '''
+            }
+        }
+
+        stage('Tag Image') {
+            steps {
+                sh '''
+                    docker tag ${ECR_REPOSITORY}:${IMAGE_TAG} \
+                    $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}
+
+                    docker tag ${ECR_REPOSITORY}:latest \
+                    $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${ECR_REPOSITORY}:latest
+                '''
             }
         }
 
         stage('Push To ECR') {
             steps {
                 sh '''
-                aws ecr get-login-password \
-                --region $AWS_REGION | docker login \
-                --username AWS \
-                --password-stdin \
-                $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+                    docker push \
+                    $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}
 
-                docker tag url-shortener:latest \
-                $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:latest
-
-                docker push \
-                $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:latest
+                    docker push \
+                    $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${ECR_REPOSITORY}:latest
                 '''
             }
         }
@@ -50,13 +71,23 @@ pipeline {
         stage('Deploy ECS') {
             steps {
                 sh '''
-                aws ecs update-service \
-                --cluster url-shortener-cluster \
-                --service url-shortener-task-service \
-                --force-new-deployment \
-                --region ap-southeast-2
+                    aws ecs update-service \
+                    --cluster $ECS_CLUSTER \
+                    --service $ECS_SERVICE \
+                    --force-new-deployment \
+                    --region $AWS_REGION
                 '''
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment completed successfully'
+        }
+
+        failure {
+            echo 'Deployment failed'
         }
     }
 }
