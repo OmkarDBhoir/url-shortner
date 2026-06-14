@@ -4,9 +4,9 @@ pipeline {
     environment {
         AWS_REGION = "${env.AWS_REGION}"
         ACCOUNT_ID = "${env.ACCOUNT_ID}"
-        ECR_REPOSITORY = "url-shortener"
-        ECS_CLUSTER = "url-shortener-cluster"
-        ECS_SERVICE = "url-shortener-task-service"
+        ECR_REPOSITORY = "${env.ECR_REPO}"
+        ECS_CLUSTER = "${env.ECS_CLUSTER}"
+        ECS_SERVICE = "${env.ECS_SERVICE}"
         IMAGE_TAG = "${env.BUILD_NUMBER}"
     }
 
