@@ -1,8 +1,8 @@
+/* groovylint-disable-next-line CompileStatic */
 pipeline {
     agent any
 
     stages {
-
         stage('Build Jar') {
             steps {
                 dir('shorturl') {
@@ -16,6 +16,46 @@ pipeline {
                 dir('shorturl') {
                     sh 'ls -lrt target/'
                 }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                dir('shorturl') {
+                    sh '''
+            docker build -t url-shortener:latest .
+            '''
+                }
+            }
+        }
+
+        stage('Push To ECR') {
+            steps {
+                sh '''
+                aws ecr get-login-password \
+                --region $AWS_REGION | docker login \
+                --username AWS \
+                --password-stdin \
+                $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+                docker tag url-shortener:latest \
+                $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:latest
+
+                docker push \
+                $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:latest
+                '''
+            }
+        }
+
+        stage('Deploy ECS') {
+            steps {
+                sh '''
+                aws ecs update-service \
+                --cluster url-shortener-cluster \
+                --service url-shortener-task-service \
+                --force-new-deployment \
+                --region ap-southeast-2
+                '''
             }
         }
     }
